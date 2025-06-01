@@ -5,7 +5,7 @@ const productController = require("../controller/product");
 router.get("/", (req, res) => {
     res.send("Hello World");
 });
-router.get("/products", productController.hello)
+router.post("/product", productController.createProduct)
 
 
 module.exports = router;
