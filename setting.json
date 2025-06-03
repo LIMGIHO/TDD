@@ -1,0 +1,8 @@
+{
+  "jest.enableCodeLens": true,
+  "jest.runAllTestsFirst": false,
+  // "jest.autoRun": {
+  //   "watch": false,    
+  //   "onSave": "none"    
+  // }
+}

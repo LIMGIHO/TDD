@@ -6,7 +6,9 @@ it("two plus two is four", () => {
 
 const request = require("supertest");
 const app = require("../../server");
-const newProduct = require("../data/new-product.json")
+const newProduct = require("../data/new-product.json");
+
+let firstProduct;
 
 it("POST /product", async () => {
     const response = await request(app)
@@ -27,4 +29,44 @@ it("should return 500 on POST /product", async () => {
     expect(response.body).toStrictEqual({
         message: "Product validation failed: description: Path `description` is required."
     });
+});
+
+it("Get /product", async () => {
+    const response = await request(app).get("/product");
+    expect(response.statusCode).toBe(200);
+    expect(Array.isArray(response.body)).toBeTruthy();
+    expect(response.body[0].name).toBeDefined();
+    expect(response.body[0].description).toBeDefined();
+    console.log(response.body)
+    firstProduct = response.body[0];
+});
+
+it("GET /product/:productId", async() => {
+    const response = await request(app).get(`/product/${firstProduct._id}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.name).toBe(firstProduct.name);
+    expect(response.body.description).toBe(firstProduct.description);
+
+});
+
+it("GET id doenst exist /product/:productId", async () => {
+    const response = await request(app).get("/product/683bb0cef450fbe87a8cddc4");
+    expect(response.statusCode).toBe(404);
+
+});
+
+it("PUT /product", async () => {
+    const res = await request(app).put("/product/683bb0cef450fbe87a8cddc3")
+                    .send({name: "updated name", description: "updated desc"});
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.name).toBe("updated name");
+    expect(res.body.description).toBe("updated desc");
+});
+
+it("PUT /product not exists", async () => {
+    const res = await request(app).put("/product/683bb0cef450fbe87a8cddc4")
+                    .send({name: "updated name", description: "updated desc"});
+
+    expect(res.statusCode).toBe(404);
 })
