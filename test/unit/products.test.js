@@ -196,4 +196,53 @@ describe("Product Controller Update", () => {
         expect(res.statusCode).toBe(500);
         expect(next).toHaveBeenCalledWith(errorMessage);
     })
+});
+
+describe("Product Controller Delete", () => {
+    beforeEach(() => {
+        productModel.findByIdAndDelete = jest.fn();
+        req.params.productId = productId;
+    });
+
+    it("Should hava a delete function", () => {
+        expect(typeof productController.findByIdAndDelete).toBe("function");
+    });
+
+    it("should call ProductModel.findByIdAndDelete", async () => {
+        await productController.deleteProduct(req, res, next);
+        expect(productModel.findByIdAndDelete).toHaveBeenCalledWith(productId)
+    });
+
+    it("should return 200 response and deleted data", async () => {
+        const deletedProduct = {
+            name : "123", description: "234"
+        };
+        productModel.findByIdAndDelete.mockReturnValue(deletedProduct);
+        await productController.deleteProduct(req, res, next);
+
+        expect(res.statusCode).toBe(200);
+        expect(res._getJSONData()).toStrictEqual(deletedProduct);
+        expect(res._isEndCalled()).toBeTruthy();
+    });
+
+    it("should handle 404 id doesnt exist", async () => {
+
+        productModel.findByIdAndDelete.mockReturnValue(null);
+        await productController.deleteProduct(req, res, next);
+
+        expect(res.statusCode).toBe(404);
+        expect(res._getJSONData()).toBe(null);
+    });
+
+    it("should handle error", async () => {
+        const errorMessage = { message: "Error" };
+        const rejectPromise = Promise.reject(errorMessage);
+
+        productModel.findByIdAndDelete.mockReturnValue(rejectPromise);
+        await productController.deleteProduct(req, res, next);
+
+        expect(res.statusCode).toBe(500);
+        expect(next).toHaveBeenLastCalledWith(errorMessage);
+
+    })
 })

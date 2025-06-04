@@ -69,4 +69,23 @@ it("PUT /product not exists", async () => {
                     .send({name: "updated name", description: "updated desc"});
 
     expect(res.statusCode).toBe(404);
+});
+
+it("DELETE /product", async () => {
+    const delRes = await request(app).get("/product/683bb0cef450fbe87a8cddc3");
+    const deletedData = delRes.body;
+    const res = await request(app).delete("/product/683bb0cef450fbe87a8cddc3")
+        .send();
+
+    expect(res.status).toBe(200);
+    expect(res.body._id).toBe(deletedData._id);
+    expect(res.body.name).toBe(deletedData.name);
+});
+
+it("DELETE /product not exists", async () => {
+    const res = (await request(app).delete("/product/683bb0cef450fbe87a8cddc3"))
+        .send();
+
+    expect(res.status).toBe(404);
+    expect(res.body).toBe(null);
 })
